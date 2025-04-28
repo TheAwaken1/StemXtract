@@ -6,6 +6,7 @@ module.exports = {
       params: {
         message: [
           "git clone https://github.com/TheAwaken1/StemXtract.git app",
+          "git clone -b pinokio-integration https://github.com/TheAwaken1/StemXtract.git app"
         ]
       }
     },
