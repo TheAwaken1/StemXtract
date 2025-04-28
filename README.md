@@ -60,6 +60,8 @@ Launch the app using the main script:
 
 ```bash
 python stemxtract.py
+```
+
 This will start a local web server. Look for a URL in the terminal output (e.g., Running on local URL: http://127.0.0.1:7860) and open it in your web browser.
 
 Usage
@@ -113,9 +115,9 @@ AcknowledgmentsUI
 
 Design: @TheAwakeOne619
 
-This application utilizes the powerful Demucs library for music source separation. Please cite the relevant papers if you use results from this tool in your work: https://github.com/adefossez/demucs@inproceedings{rouard2022hybrid,
+This application utilizes the powerful Demucs library for music source separation. Please cite the relevant papers if you use results from this tool in your work: https://github.com/adefossez/demucs
 
-
+@inproceedings{rouard2022hybrid,
   title={Hybrid Transformers for Music Source Separation},
   author={Rouard, Simon and Massa, Francisco and D{'e}fossez, Alexandre},
   booktitle={ICASSP 23},
