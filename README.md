@@ -1,7 +1,7 @@
 # StemXtract: AI Stem Separation & Blending
 
 <p align="center">
-  <img src="icon.png" alt="StemXtract Logo" width="150"/>
+  <img src="icon.png" alt="StemXtract Logo" width="100%"/>
 </p>
 
 StemXtract is a user-friendly application built with Gradio that allows you to:
