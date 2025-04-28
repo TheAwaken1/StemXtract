@@ -117,13 +117,14 @@ Design: @TheAwakeOne619
 
 This application utilizes the powerful Demucs library for music source separation. Please cite the relevant papers if you use results from this tool in your work: https://github.com/adefossez/demucs
 
+```bibtex
 @inproceedings{rouard2022hybrid,
   title={Hybrid Transformers for Music Source Separation},
   author={Rouard, Simon and Massa, Francisco and D{'e}fossez, Alexandre},
   booktitle={ICASSP 23},
   year={2023}
 }
-```bibtex
+
 @inproceedings{defossez2021hybrid,
   title={Hybrid Spectrogram and Waveform Source Separation},
   author={D{'e}fossez, Alexandre},
