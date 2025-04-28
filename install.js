@@ -1,33 +1,29 @@
 module.exports = {
   run: [
-    // Step 1: Clone the default (main) branch of the repository into the 'app' directory
+    // Edit this step to customize the git repository to use
     {
       method: "shell.run",
       params: {
         message: [
-          // Removed the '-b pinokio-integration' flag to clone the default branch
-          // Clone into a directory named 'app'
-          "git clone https://github.com/TheAwaken1/StemXtract.git app"
+          "git clone https://github.com/TheAwaken1/StemXtract.git app",
         ]
-        // Optional: Define 'path' if the clone needs to happen relative to a different base directory
-        // path: "." // Example: clone in the root script directory
       }
     },
-
-    // Step 2: Install Torch (using torch.js)
-    // Make sure the 'path' here correctly points to where the code was cloned ('app')
+    // Delete this step if your project does not use torch
     {
       method: "script.start",
       params: {
         uri: "torch.js",
         params: {
-          venv: "env", // Virtual environment directory name
-          path: "app", // Run torch.js relative to the cloned 'app' directory
-          // sageattention2: true // Uncomment if needed by your main branch
+          venv: "env",                // Edit this to customize the venv folder path
+          path: "app",                // Edit this to customize the path to start the shell from
+          // xformers: true   // uncomment this line if your project requires xformers
+          // triton: true   // uncomment this line if your project requires triton
+          // sageattention: true   // uncomment this line if your project requires sageattention
         }
       }
     },
-
+    // Edit this step with your custom install commands
     // Step 3: Install Demucs and other specific dependencies (if needed beyond requirements.txt)
     // Ensure 'path' points to the 'app' directory
     {
@@ -45,22 +41,17 @@ module.exports = {
       }
     },
 
-    // Step 4: Install dependencies from requirements.txt (from the main branch)
-    // Ensure 'path' points to the 'app' directory
     {
       method: "shell.run",
       params: {
-        venv: "env", // Use the same venv
-        path: "app", // Run pip install inside the 'app' directory
+        venv: "env",                // Edit this to customize the venv folder path
+        path: "app",                // Edit this to customize the path to start the shell from
         message: [
-          // Assuming requirements.txt exists in the main branch
+          "uv pip install gradio devicetorch",
           "uv pip install -r requirements.txt"
-          // Note: The previous "pip install gradio devicetorch" might be redundant
-          // if these are already in requirements.txt. Clean up as needed.
         ]
       }
     },
-
     // Step 5: Install ffmpeg (if needed by the main branch)
     // This step might not need venv or path if it's a system-level conda install
     {
