@@ -1,5 +1,9 @@
 # StemXtract: AI Stem Separation & Blending
 
+<p align="center">
+  <img src="icon.png" alt="StemXtract Logo" width="150"/>
+</p>
+
 StemXtract is a user-friendly application built with Gradio that allows you to:
 1.  Separate audio tracks into vocal and instrumental stems using AI models (Demucs).
 2.  Blend different audio tracks (e.g., vocals from one song with an instrumental from another).
