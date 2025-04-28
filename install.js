@@ -5,7 +5,8 @@ module.exports = {
       method: "shell.run",
       params: {
         message: [
-            "https://github.com/TheAwaken1/StemXtract.git"
+            // Clone the specific branch into the 'app' directory
+      "git clone -b pinokio-integration https://github.com/TheAwaken1/StemXtract.git app"
         ]
       }
     },
