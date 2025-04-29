@@ -8,7 +8,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128",
+          "uv pip install torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0 numpy==1.24.4 --index-url https://download.pytorch.org/whl/cu128",
           "{{args && args.triton ? 'uv pip install -U --pre triton-windows' : ''}}",
           "{{args && args.sageattention ? 'uv pip install https://github.com/woct0rdho/SageAttention/releases/download/v2.1.1-windows/sageattention-2.1.1+cu128torch2.7.0-cp310-cp310-win_amd64.whl' : ''}}"
         ]
@@ -23,7 +23,9 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128"
+          "uv pip install torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0 numpy==1.24.4 --index-url https://download.pytorch.org/whl/cu128",
+          "{{args && args.triton ? 'uv pip install -U --pre triton' : ''}}",
+          "{{args && args.sageattention ? 'uv pip install git+https://github.com/thu-ml/SageAttention.git@2.1.1' : ''}}"
         ]
       },
       "next": null
@@ -36,7 +38,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 torchaudio==2.0.1+cu118 -f https://download.pytorch.org/whl/torch_stable.html"
+          "uv pip install torch==2.8.0+cu118 torchvision==0.23.0+cu118 torchaudio==2.8.0 numpy==2.1.2 -f https://download.pytorch.org/whl/torch_stable.html"
         ]
       }
     },
@@ -48,7 +50,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch-directml==2.0.0 torchaudio==2.0.1 torchvision==0.15.1 numpy==1.26.4"
+          "uv pip install torch-directml==2.8.0 torchaudio==2.8.0 torchvision==0.23.0 numpy==2.1.2"
         ]
       }
     },
@@ -60,7 +62,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.5.0 torchvision==0.20.0 torchaudio==2.5.0 numpy==1.26.4 --index-url https://download.pytorch.org/whl/cpu"
+          "uv pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 numpy==2.1.2 --index-url https://download.pytorch.org/whl/cpu"
         ]
       }
     },
@@ -72,7 +74,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1 numpy==1.26.4"
+          "uv pip install torch torchvision torchaudio numpy==2.1.2"
         ]
       }
     },
@@ -84,7 +86,8 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 torchaudio==2.0.1+cu118 -f https://download.pytorch.org/whl/torch_stable.html"
+          "uv pip install torch==2.8.0+cu118 torchvision==0.23.0+cu118 torchaudio==2.8.0 numpy==2.1.2 -f https://download.pytorch.org/whl/torch_stable.html",
+          "{{args && args.sageattention ? 'uv pip install git+https://github.com/thu-ml/SageAttention.git@2.1.1' : ''}}"
         ]
       }
     },
@@ -96,7 +99,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/rocm5.6"
+          "uv pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 numpy==2.1.2 --index-url https://download.pytorch.org/whl/rocm5.6"
         ]
       }
     },
@@ -108,7 +111,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cpu"
+          "uv pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 numpy==2.1.2 --index-url https://download.pytorch.org/whl/cpu"
         ]
       }
     }
