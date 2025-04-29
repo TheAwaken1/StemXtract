@@ -115,9 +115,9 @@ Errors During Processing: Check the console/terminal where you ran python stemxt
 
 LicenseThis project is licensed under the MIT License. See the LICENSE file for details.
 
-AcknowledgmentsUI 
+Acknowledgments
 
-Design: @TheAwakeOne619
+UI Design: @TheAwakeOne619
 
 This application utilizes the powerful Demucs library for music source separation. Please cite the relevant papers if you use results from this tool in your work: https://github.com/adefossez/demucs
 
