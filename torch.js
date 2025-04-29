@@ -38,7 +38,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.7.0+cu118 torchvision==0.22.0+cu118 torchaudio==2.7.0+cu118 -f https://download.pytorch.org/whl/torch_stable.html"
+          "uv pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 torchaudio==2.0.1+cu118 -f https://download.pytorch.org/whl/torch_stable.html"
         ]
       }
     },
@@ -56,7 +56,7 @@ module.exports = {
     },
     // Windows CPU
     {
-      "when": "{{platform === 'win32' && ( archetype !== 'nvidia' && archetype !== 'amd')}}",
+      "when": "{{platform === 'win32' && (gpu !== 'nvidia' && gpu !== 'amd')}}",
       "method": "shell.run",
       "params": {
         "venv": "{{args && args.venv ? args.venv : null}}",
@@ -66,7 +66,7 @@ module.exports = {
         ]
       }
     },
-    // Mac (Intel, CPU-only)
+    // Mac
     {
       "when": "{{platform === 'darwin'}}",
       "method": "shell.run",
@@ -74,7 +74,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.0.0+cpu torchvision==0.15.1+cpu torchaudio==2.0.1+cpu numpy==1.26.4 --index-url https://download.pytorch.org/whl/cpu"
+          "uv pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 numpy==1.26.4"
         ]
       }
     },
@@ -86,8 +86,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.7.0+cu118 torchvision==0.22.0+cu118 torchaudio==2.7.0+cu118 -f https://download.pytorch.org/whl/torch_stable.html",
-          "{{args && args.sageattention ? 'uv pip install git+https://github.com/thu-ml/SageAttention.git@2.1.1' : ''}}"
+          "uv pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 torchaudio==2.0.1+cu118 -f https://download.pytorch.org/whl/torch_stable.html"
         ]
       }
     },
