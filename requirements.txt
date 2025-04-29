@@ -1,9 +1,9 @@
 gradio==5.27.0
 soundfile==0.12.1
-librosa==0.11.0
+librosa==0.10.0
 resampy==0.4.3
-numpy
+numpy==2.1.2  # Will be overridden by torch.js to 1.24.4
 diffq==0.2.4
-matplotlib==3.10.1
+matplotlib==3.7.1
 pedalboard==0.9.16
-scipy==1.15.2
+scipy==1.10.1
