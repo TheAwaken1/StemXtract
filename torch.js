@@ -2,7 +2,7 @@ module.exports = {
   run: [
     // NVIDIA 50-series Windows
     {
-      "when": "{{platform === 'win32' && gpu === 'nvidia' && kernel.gpu_model && /50\\d{2,}/.test(kernel.gpu_model) }}",
+      "when": "{{platform === 'win32' && gpu === 'nvidia' && kernel.gpus && kernel.gpus.find(x => / 50.+/.test(x.model))}}",
       "method": "shell.run",
       "params": {
         "venv": "{{args && args.venv ? args.venv : null}}",
@@ -17,28 +17,27 @@ module.exports = {
     },
     // NVIDIA 50-series Linux
     {
-      "when": "{{platform === 'linux' && gpu === 'nvidia' && kernel.gpu_model && /50\\d{2,}/.test(kernel.gpu_model) }}",
+      "when": "{{platform === 'linux' && gpu === 'nvidia' && kernel.gpus && kernel.gpus.find(x => / 50.+/.test(x.model))}}",
       "method": "shell.run",
       "params": {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
           "uv pip install torch==2.7.0 torchvision==0.22.0 torchaudio==2.7.0 numpy==1.24.4 --index-url https://download.pytorch.org/whl/cu128",
-          "{{args && args.triton ? 'uv pip install -U --pre triton' : ''}}",
-          "{{args && args.sageattention ? 'uv pip install git+https://github.com/thu-ml/SageAttention.git@2.1.1' : ''}}"
+          "{{args && args.triton ? 'uv pip install -U --pre triton' : ''}}"
         ]
       },
       "next": null
     },
     // Windows NVIDIA (non-50-series)
     {
-      "when": "{{platform === 'win32' && gpu === 'nvidia' && !(kernel.gpu_model && /50\\d{2,}/.test(kernel.gpu_model))}}",
+      "when": "{{platform === 'win32' && gpu === 'nvidia' && !(kernel.gpus && kernel.gpus.find(x => / 50.+/.test(x.model)))}}",
       "method": "shell.run",
       "params": {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.8.0+cu118 torchvision==0.23.0+cu118 torchaudio==2.8.0 numpy==2.1.2 -f https://download.pytorch.org/whl/torch_stable.html"
+          "uv pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 torchaudio==2.0.1+cu118 numpy==1.24.4 -f https://download.pytorch.org/whl/torch_stable.html"
         ]
       }
     },
@@ -50,7 +49,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch-directml==2.8.0 torchaudio==2.8.0 torchvision==0.23.0 numpy==2.1.2"
+          "uv pip install torch-directml==2.0.0 torchaudio==2.0.1 torchvision==0.15.1 numpy==1.24.4"
         ]
       }
     },
@@ -62,11 +61,11 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 numpy==2.1.2 --index-url https://download.pytorch.org/whl/cpu"
+          "uv pip install torch==2.0.0+cpu torchvision==0.15.1+cpu torchaudio==2.0.1+cpu numpy==1.24.4 --index-url https://download.pytorch.org/whl/cpu"
         ]
       }
     },
-    // Mac
+    // Mac (Intel, CPU-only)
     {
       "when": "{{platform === 'darwin'}}",
       "method": "shell.run",
@@ -74,20 +73,19 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch torchvision torchaudio numpy==2.1.2"
+          "uv pip install torch==2.0.0+cpu torchvision==0.15.1+cpu torchaudio==2.0.1+cpu numpy==1.24.4 --index-url https://download.pytorch.org/whl/cpu"
         ]
       }
     },
     // Linux NVIDIA (non-50-series)
     {
-      "when": "{{platform === 'linux' && gpu === 'nvidia' && !(kernel.gpu_model && /50\\d{2,}/.test(kernel.gpu_model))}}",
+      "when": "{{platform === 'linux' && gpu === 'nvidia' && !(kernel.gpus && kernel.gpus.find(x => / 50.+/.test(x.model)))}}",
       "method": "shell.run",
       "params": {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.8.0+cu118 torchvision==0.23.0+cu118 torchaudio==2.8.0 numpy==2.1.2 -f https://download.pytorch.org/whl/torch_stable.html",
-          "{{args && args.sageattention ? 'uv pip install git+https://github.com/thu-ml/SageAttention.git@2.1.1' : ''}}"
+          "uv pip install torch==2.0.0+cu118 torchvision==0.15.1+cu118 torchaudio==2.0.1+cu118 numpy==1.24.4 -f https://download.pytorch.org/whl/torch_stable.html"
         ]
       }
     },
@@ -99,7 +97,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 numpy==2.1.2 --index-url https://download.pytorch.org/whl/rocm5.6"
+          "uv pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1 numpy==1.24.4 --index-url https://download.pytorch.org/whl/rocm5.6"
         ]
       }
     },
@@ -111,7 +109,7 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          "uv pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 numpy==2.1.2 --index-url https://download.pytorch.org/whl/cpu"
+          "uv pip install torch==2.0.0+cpu torchvision==0.15.1+cpu torchaudio==2.0.1+cpu numpy==1.24.4 --index-url https://download.pytorch.org/whl/cpu"
         ]
       }
     }
