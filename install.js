@@ -9,7 +9,7 @@ module.exports = {
     {
       "method": "shell.run",
       "params": {
-        "message": "git clone -b pinokio-integration https://github.com/TheAwaken1/Intelligent-Excel-Analyzer.git app"
+        "message": "git clone -b main https://github.com/TheAwaken1/StemXtract.git app"
       }
     },
     {
