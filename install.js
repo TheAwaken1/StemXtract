@@ -5,7 +5,7 @@ module.exports = {
       method: "shell.run",
       params: {
         message: [
-          "git clone https://github.com/TheAwaken1/StemXtract.git"
+          "https://github.com/TheAwaken1/StemXtract.git"
         ]
       }
     },
