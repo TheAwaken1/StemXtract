@@ -3,7 +3,7 @@ module.exports = {
     {
       "method": "script.download",
       "params": {
-        "uri": "https://github.com/TheAwaken1/StemXtract.git"
+        "message": "git clone -b main https://github.com/TheAwaken1/StemXtract app"
       }
     },
     {
@@ -12,7 +12,7 @@ module.exports = {
         "uri": "torch.js",
         "params": {
           "venv": "env",
-          "path": "app/StemXtract"
+          "path": "app"
         }
       }
     },
@@ -20,7 +20,7 @@ module.exports = {
       "method": "shell.run",
       "params": {
         "venv": "env",
-        "path": "app/StemXtract",
+        "path": "app",
         "message": [
           "uv pip install demucs==4.0.1",
           "uv pip install gradio==5.27.0",
@@ -32,7 +32,7 @@ module.exports = {
       "method": "shell.run",
       "params": {
         "venv": "env",
-        "path": "app/StemXtract",
+        "path": "app",
         "message": [
           "uv pip install gradio devicetorch",
           "uv pip install -r requirements.txt"
