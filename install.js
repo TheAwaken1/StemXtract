@@ -1,13 +1,19 @@
 module.exports = {
   run: [
     {
-      "method": "script.download",
+      "method": "shell.run",
+      "params": {
+        "message": "rmdir /s /q app || echo App directory not found"
+      }
+    },
+    {
+      "method": "shell.run",
       "params": {
         "message": "git clone -b main https://github.com/TheAwaken1/StemXtract.git app"
       }
     },
     {
-      "method": "script.start",
+      "method": "shell.run",
       "params": {
         "uri": "torch.js",
         "params": {
