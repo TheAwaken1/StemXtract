@@ -3,7 +3,7 @@ module.exports = {
     {
       "method": "script.download",
       "params": {
-        "message": "git clone -b main https://github.com/TheAwaken1/StemXtract app"
+        "message": "git clone -b main https://github.com/TheAwaken1/StemXtract.git app"
       }
     },
     {
