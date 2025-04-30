@@ -14,6 +14,7 @@ module.exports = {
         "message": "git clone -b main https://github.com/TheAwaken1/StemXtract.git app"
       }
     },
+    // Step 3: Install PyTorch and related packages (includes venv creation)
     {
       "method": "script.start",
       "params": {
@@ -27,6 +28,7 @@ module.exports = {
         }
       }
     },
+    // Step 4: Install core Python dependencies
     {
       "method": "shell.run",
       "params": {
@@ -39,7 +41,7 @@ module.exports = {
         ]
       }
     },
-    // Edit this step with your custom install commands
+    // Step 5: Install additional Python dependencies
     {
       "method": "shell.run",
       "params": {
@@ -51,13 +53,14 @@ module.exports = {
         ]
       }
     },
+    // Step 6: Install system dependencies (ffmpeg, libsndfile, cmake, gfortran)
     {
       "when": "{{platform === 'darwin'}}",
       "method": "shell.run",
       "params": {
         "message": [
-          // Try Homebrew first, fallback to Conda
-          "brew install ffmpeg || conda install ffmpeg -c conda-forge --yes || echo 'FFmpeg installation failed, please install manually'"
+          // Install ffmpeg, libsndfile, cmake, and gcc (includes gfortran) via Homebrew, with Conda fallback for ffmpeg
+          "brew install ffmpeg libsndfile cmake gcc || conda install ffmpeg -c conda-forge --yes || echo 'System dependencies (ffmpeg, libsndfile, cmake, gcc) installation failed. Please install manually with: brew install ffmpeg libsndfile cmake gcc'"
         ]
       }
     },
@@ -66,11 +69,22 @@ module.exports = {
       "method": "shell.run",
       "params": {
         "message": [
-          // Try apt-get for Debian/Ubuntu, yum for CentOS, fallback to Conda
-          "sudo apt-get update && sudo apt-get install -y ffmpeg || sudo yum install -y ffmpeg || conda install ffmpeg -c conda-forge --yes || echo 'FFmpeg installation failed, please install manually'"
+          // Try apt-get for Debian/Ubuntu, yum for CentOS, with Conda fallback for ffmpeg
+          "sudo apt-get update && sudo apt-get install -y ffmpeg libsndfile1-dev cmake gfortran || sudo yum install -y ffmpeg libsndfile-devel cmake gcc-gfortran || conda install ffmpeg -c conda-forge --yes || echo 'System dependencies (ffmpeg, libsndfile, cmake, gfortran) installation failed. Please install manually with: sudo apt-get install ffmpeg libsndfile1-dev cmake gfortran or sudo yum install ffmpeg libsndfile-devel cmake gcc-gfortran'"
         ]
       }
     },
+    {
+      "when": "{{platform === 'win32'}}",
+      "method": "shell.run",
+      "params": {
+        "message": [
+          // Windows only needs ffmpeg, as libsndfile, cmake, and gfortran are handled by Conda or not required
+          "conda install ffmpeg -c conda-forge --yes || echo 'FFmpeg installation failed. Please install manually with: conda install ffmpeg'"
+        ]
+      }
+    },
+    // Step 7: Notify user
     {
       "method": "notify",
       "params": {
