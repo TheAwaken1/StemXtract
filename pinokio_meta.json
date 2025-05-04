@@ -1,4 +1,20 @@
 {
-  "links": [],
-  "posts": []
+  "posts": [
+  ],
+  "links": [{
+    "title": "theawakenone619 (wrote the launcher)",
+    "links": [{
+      "type": "bitcoin",
+      "value": "3NPZSTatpNw4V6EksJKk3LbjM2s7jNQD9F"
+    }, {
+      "title": "X",
+      "value": "https://x.com/TheAwakenOne619"
+    }, {
+      "title": "Github",
+      "value": "https://github.com/TheAwaken1"
+    }, {
+      "title": "Discord",
+      "value": "theawakenone619_63551_73694"
+    }]
+  }]
 }
