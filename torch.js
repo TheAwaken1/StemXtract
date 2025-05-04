@@ -74,8 +74,8 @@ module.exports = {
         "venv": "{{args && args.venv ? args.venv : null}}",
         "path": "{{args && args.path ? args.path : '.'}}",
         "message": [
-          // Use torch 2.3.1 for better MPS support and compatibility with torchaudio
-          "uv pip install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1 numpy==1.26.4"
+          // Use torch 2.0.1 for better MPS support and compatibility with torchaudio
+          "uv pip install torch==2.0.1 torchaudio==2.0.2 numpy==1.26.4"
         ]
       }
     },
