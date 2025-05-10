@@ -1,21 +1,21 @@
 {
-  "posts": [
-    "https://x.com/TheAwakenOne619/status/1909110459493720526"
-  ],
-  "links": [{
-    "title": "Created for Pinokio",
-    "links": [{
-      "type": "bitcoin",
-      "value": "3NPZSTatpNw4V6EksJKk3LbjM2s7jNQD9F"
-    }, {
-      "title": "X",
+  "links": [
+    {
+      "title": "x",
       "value": "https://x.com/TheAwakenOne619"
-    }, {
-      "title": "Github",
+    },
+    {
+      "title": "github",
       "value": "https://github.com/TheAwaken1"
-    }, {
-      "title": "huggingface",
-      "value": "https://huggingface.co/TheAwakenOne"
-    }]
-  }]
+    },
+    {
+      "title": "buymeacoffee",
+      "value": "https://buymeacoffee.com/cmpcreativn"
+    },
+    {
+      "title": "bitcoin",
+      "value": "3NPZSTatpNw4V6EksJKk3LbjM2s7jNQD9F"
+    }
+  ],
+  "posts": []
 }
