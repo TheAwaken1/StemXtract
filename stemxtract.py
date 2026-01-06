@@ -15,6 +15,7 @@ import librosa
 import shutil  # Added, used for file operations like copying
 import platform
 import tempfile
+import yt_dlp
 from typing import List, Dict, Tuple, Optional, Union
 
 # Pedalboard Check
@@ -47,7 +48,7 @@ except ImportError as e:
 from librosa.feature.rhythm import tempo as librosa_tempo
 
 # Constants
-MODELS = ["mdx", "mdx_extra", "mdx_q"]
+MODELS = ["htdemucs", "mdx", "mdx_extra", "mdx_q"]
 OUTPUT_DIR = "output"
 SAMPLE_RATE = 44100
 STEM_NAMES = ["drums", "bass", "other", "vocals"]
@@ -779,6 +780,33 @@ def process_audio(
         else:
             print("Warning: Vocals stem not available.")
 
+        # Save drums stem
+        drums_tensor = source_tensors.get("drums")
+        if drums_tensor is not None:
+            drums_np = drums_tensor.cpu().permute(1, 0).numpy()
+            drums_path = get_unique_filename("drums", OUTPUT_DIR, ext=".wav")
+            sf.write(drums_path, drums_np, sr, format="WAV")
+            output["stem_files"]["drums"] = (drums_np, sr, drums_path)
+            print(f"Saved drums stem as WAV: {drums_path}")
+
+        # Save bass stem
+        bass_tensor = source_tensors.get("bass")
+        if bass_tensor is not None:
+            bass_np = bass_tensor.cpu().permute(1, 0).numpy()
+            bass_path = get_unique_filename("bass", OUTPUT_DIR, ext=".wav")
+            sf.write(bass_path, bass_np, sr, format="WAV")
+            output["stem_files"]["bass"] = (bass_np, sr, bass_path)
+            print(f"Saved bass stem as WAV: {bass_path}")
+
+        # Save other stem
+        other_tensor = source_tensors.get("other")
+        if other_tensor is not None:
+            other_np = other_tensor.cpu().permute(1, 0).numpy()
+            other_path = get_unique_filename("other", OUTPUT_DIR, ext=".wav")
+            sf.write(other_path, other_np, sr, format="WAV")
+            output["stem_files"]["other"] = (other_np, sr, other_path)
+            print(f"Saved other stem as WAV: {other_path}")
+
         # Calculate and save instrumental stem
         instrumental_tensor = None
         if all(k in source_tensors for k in ['drums', 'bass', 'other']):
@@ -937,6 +965,17 @@ def process_track(
         raise gr.Error(f"Processing failed: {result['error']}")
     vocals_path = result.get("stem_files", {}).get("vocals", "")
     instrumental_path = result.get("stem_files", {}).get("instrumental")
+    
+    drums_data = result.get("stem_files", {}).get("drums")
+    bass_data = result.get("stem_files", {}).get("bass")
+    other_data = result.get("stem_files", {}).get("other")
+    vocals_data = result.get("stem_files", {}).get("vocals")
+
+    drums_path = drums_data[2] if drums_data else None
+    bass_path = bass_data[2] if bass_data else None
+    other_path = other_data[2] if other_data else None
+    vocals_path_out = vocals_data[2] if vocals_data else None
+
     if not instrumental_path and task == "remove_vocals": instrumental_path = result.get("processed_audio", "")
     waveform_vis_path = result.get("visualizations", {}).get("waveform")
     processed_player_audio = result.get("processed_audio")
@@ -944,7 +983,8 @@ def process_track(
     print(f"--- Processing Successful ---")
     return (processed_player_audio, f"{result.get('processing_time', 0):.2f} seconds", waveform_vis_path,
             result.get("processed_audio", ""), vocals_path or "", instrumental_path or "",
-            result.get("processed_audio", ""), waveform_vis_path, f"{result.get('processing_time', 0):.2f} seconds")
+            result.get("processed_audio", ""), waveform_vis_path, f"{result.get('processing_time', 0):.2f} seconds",
+            drums_path, bass_path, other_path, vocals_path_out)
 
 def update_track_visibility_factory(controls_list, audio_component, is_track1=True):
     def update_track_visibility(track_source, vocals_state, instrumental_state, vocals_path, instrumental_path):
@@ -998,8 +1038,47 @@ def save_file(audio_data, filename_prefix):
 def save_file_vocals(audio_data):
     return save_file(audio_data, "vocals")
 
+def save_file_drums(audio_data):
+    return save_file(audio_data, "drums")
+
+def save_file_bass(audio_data):
+    return save_file(audio_data, "bass")
+
+def save_file_other(audio_data):
+    return save_file(audio_data, "other")
+
 def save_file_instrumental(audio_data):
     return save_file(audio_data, "instrumental")
+
+def download_from_youtube(url, progress=gr.Progress()):
+    if not url:
+        raise gr.Error("Please enter a YouTube URL!")
+    
+    print(f"Downloading from YouTube: {url}")
+    try:
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'outtmpl': os.path.join(OUTPUT_DIR, '%(title)s.%(ext)s'),
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'wav',
+                'preferredquality': '192',
+            }],
+            'quiet': True,
+            'no_warnings': True,
+        }
+        
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            filename = ydl.prepare_filename(info)
+            # yt-dlp with postprocessor changes extension
+            filename = os.path.splitext(filename)[0] + ".wav"
+            
+        print(f"Downloaded to: {filename}")
+        return filename
+    except Exception as e:
+        print(f"YouTube Download Error: {e}")
+        raise gr.Error(f"Download failed: {str(e)}")
 
 # CSS Function (unchanged)
 def custom_css():
@@ -1075,11 +1154,14 @@ def custom_css():
 
 # Gradio UI Definition Function with Full Single-Page Layout
 def create_interface():
-    with gr.Blocks(title="StemXtract", css=custom_css()) as app:
+    with gr.Blocks(title="StemXtract") as app:
         # State variables (Keep as is)
         processed_audio_state = gr.State(None)
         extracted_vocals_state = gr.State(None)
         extracted_instrumental_state = gr.State(None)
+        extracted_drums_state = gr.State(None)
+        extracted_bass_state = gr.State(None)
+        extracted_other_state = gr.State(None)
         processed_vocals_path = gr.State(None)
         processed_instrumental_path = gr.State(None)
         final_output_audio = gr.State(None)
@@ -1095,26 +1177,28 @@ def create_interface():
         with gr.Accordion("How to Use", open=False):
             gr.Markdown(
                 """
-                1.  **Upload Audio**:
-                    * In the "Upload Audio" section, drag and drop an audio file or click to browse.
-                    * Supported formats: MP3, WAV, FLAC, AAC (max 50MB).
+                1. **Download from YouTube or Upload Audio**:
+                * In the "Download from YouTube" section, copy and paste a YouTube link and click "Download Audio".
+                * Or drag and drop / upload an audio file in the "Upload Audio" section.
+                * Supported formats: MP3, WAV, FLAC, AAC (max 50MB).
 
-                2.  **Process Audio**:
-                    * In the "AI Stem Separation" section, select an AI model and task (e.g., "remove_vocals" to isolate the instrumental).
-                    * Optionally adjust settings in the "Stem Effects" accordion.
-                    * Click "Process Audio" to separate the stems.
+                2. **Process Audio**:
+                * In the "AI Stem Separation" section, select an AI model and task (e.g., "remove_vocals" to isolate the instrumental).
+                * Optionally adjust settings in the "Stem Effects" accordion.
+                * Click "Process Audio" to separate the stems.
 
-                3.  **Blend Tracks (Optional)**:
-                    * In the "Track Blending" section, choose sources for Track 1 and Track 2 (e.g., upload a new track or use processed vocals).
-                    * Adjust volume and blending controls (e.g., match tempo, manual offset).
-		            * Uncheck Match Track 1 Tempo if vocals or instrumental are too fast or too slow and set Manual Offset (best between 150-350).
-                    * Best if isolated vocals are used in track 2 but it works either way.
-                    * Optionally, apply effects in the "Track Effects" accordion.
-                    * Click "Blend Tracks" to mix the tracks.
+                3. **Blend Tracks (Optional)**:
+                * In the "Track Blending" section, choose sources for Track 1 and Track 2 (e.g., upload a new track or use processed vocals or instrumental).
+                * Adjust volume and blending controls (e.g., match tempo, manual offset).
+                * Uncheck Match Track 1 Tempo if vocals or instrumental are too fast or too slow and set Manual Offset (best between 150-350).
+                * Best if isolated vocals are used in track 2 but it works either way.
+                * Optionally, apply effects in the "Track Effects" accordion.
+                * Click "Blend Tracks" to mix the tracks.
 
-                4.  **Download Stems**:
-                    * In the "Final Output" section, listen to the processed or blended audio.
-                    * Under "Stem Downloads", click "Download Vocals" or "Download Instrumental" to save the separated stems.
+                4. **Listen and Download Stems**:
+                * In the "Final Output" section, listen to the processed or blended audio.
+                * In the "Separated Stems" section, play Drums, Bass, Other, Vocals, and Instrumental.
+                * Download links for all stems appear in the "Stem Downloads" section after processing.
 
                 ---
                 ### Acknowledgements
@@ -1145,6 +1229,13 @@ def create_interface():
         with gr.Row():
             # Left Column: Process Audio
             with gr.Column(scale=1):
+                # YouTube Download Section
+                with gr.Group():
+                    gr.HTML('<div class="section-header">Download from YouTube</div>')
+                    youtube_url = gr.Textbox(label="YouTube URL", placeholder="Paste link here...")
+                    yt_download_btn = gr.Button("Download Audio", variant="secondary")
+                    yt_audio_output = gr.Audio(label="Downloaded Audio", type="filepath", interactive=False)
+
                 # Upload Audio Section
                 with gr.Group():
                     gr.HTML('<div class="section-header">Upload Audio</div>')
@@ -1157,7 +1248,7 @@ def create_interface():
                     with gr.Group():
                         gr.HTML('<div class="section-header">AI Stem Separation</div>')
                         gr.Markdown("Select a model, task, and output format for stem separation.", elem_classes=["note-text"])
-                        model_dropdown = gr.Dropdown(choices=MODELS, label="AI Model Selection", value="mdx_extra")
+                        model_dropdown = gr.Dropdown(choices=MODELS, label="AI Model Selection", value="htdemucs")
                         task_dropdown = gr.Dropdown(choices=["remove_vocals", "isolate_vocals", "mix_stems"], label="Task", value="remove_vocals")
                         
                         trim_silence_chk = gr.Checkbox(label="Trim Silence", value=False)
@@ -1258,6 +1349,15 @@ def create_interface():
             # Right Column: Final Output
             with gr.Column(scale=1):
                 with gr.Group():
+                    gr.HTML('<div class="results-header">Separated Stems</div>')
+                    with gr.Row():
+                        out_drums = gr.Audio(label="Drums", type="filepath", interactive=False)
+                        out_bass = gr.Audio(label="Bass", type="filepath", interactive=False)
+                    with gr.Row():
+                        out_other = gr.Audio(label="Other", type="filepath", interactive=False)
+                        out_vocals = gr.Audio(label="Vocals", type="filepath", interactive=False)
+
+                with gr.Group():
                     gr.HTML('<div class="results-header">Final Output</div>')
                     final_audio_player = gr.Audio(label="Final Output")
                     final_time_text = gr.Textbox(label="Processing/Blending Time", interactive=False)
@@ -1265,8 +1365,12 @@ def create_interface():
                     gr.HTML('<div class="results-header">Stem Downloads</div>')
                     gr.Markdown("Download the separated stems from your last process.", elem_classes=["note-text"])
                     with gr.Row():
+                        download_drums_btn = gr.Button("Download Drums", variant="secondary")
+                        download_bass_btn = gr.Button("Download Bass", variant="secondary")
+                    with gr.Row():
+                        download_other_btn = gr.Button("Download Other", variant="secondary")
                         download_vocals_btn = gr.Button("Download Vocals", variant="secondary", interactive=False)
-                        download_instrumental_btn = gr.Button("Download Instrumental", variant="secondary", interactive=False)
+                    download_instrumental_btn = gr.Button("Download Instrumental", variant="secondary", interactive=False)
 
         # --- Event Handlers ---
         # (Define helper functions FIRST)
@@ -1274,6 +1378,20 @@ def create_interface():
         def update_stem_effects_visibility(selected_task):
             is_mix = selected_task == "mix_stems"; is_instrumental = selected_task == "remove_vocals"; is_vocals = selected_task == "isolate_vocals" #
             return { mix_stems_controls: gr.update(visible=is_mix), instrumental_effects_controls: gr.update(visible=is_instrumental), vocal_effects_controls: gr.update(visible=is_vocals), stem_effects_accordion: gr.update(visible=True) } #
+
+
+        # YouTube Download Event
+        yt_download_btn.click(
+            fn=download_from_youtube,
+            inputs=[youtube_url],
+            outputs=[yt_audio_output]
+        )
+        # When YouTube download finishes, populate the upload audio component
+        yt_audio_output.change(
+            fn=lambda x: x,
+            inputs=[yt_audio_output],
+            outputs=[audio_input]
+        )
 
         def process_track_wrapper(
             audio_file, task, model_name, drums_vol, bass_vol, other_vol, vocals_vol,
@@ -1297,8 +1415,21 @@ def create_interface():
             if result.get("error"):
                 raise gr.Error(f"Processing failed: {result['error']}")
             processed_data = result.get("processed_audio")
+            
+            # Extract stem data (numpy, sr, path)
+            drums_data = result.get("stem_files", {}).get("drums")
+            bass_data = result.get("stem_files", {}).get("bass")
+            other_data = result.get("stem_files", {}).get("other")
             vocals_data = result.get("stem_files", {}).get("vocals")
             instrumental_data = result.get("stem_files", {}).get("instrumental")
+            
+            # Extract paths
+            drums_path = drums_data[2] if drums_data else None
+            bass_path = bass_data[2] if bass_data else None
+            other_path = other_data[2] if other_data else None
+            vocals_path = vocals_data[2] if vocals_data else None
+            instrumental_path = instrumental_data[2] if instrumental_data else None
+
             audio_player_output = processed_data[2] if processed_data else None  # Use path
             vocals_available = vocals_data is not None
             instrumental_available = instrumental_data is not None
@@ -1306,11 +1437,13 @@ def create_interface():
             return (
                 audio_player_output, f"{result.get('processing_time', 0):.2f}s",
                 processed_data, vocals_data, instrumental_data,
-                vocals_data[2] if vocals_data else None,  # Use path
-                instrumental_data[2] if instrumental_data else None,
+                drums_data, bass_data, other_data,
+                vocals_path,  # Use path
+                instrumental_path,
                 audio_player_output, f"{result.get('processing_time', 0):.2f}s",
                 gr.update(interactive=vocals_available),
-                gr.update(interactive=instrumental_available)
+                gr.update(interactive=instrumental_available),
+                drums_path, bass_path, other_path, vocals_path
             )
 
         def reset_blending_state(): return None, "", "Upload New Track", None, "Upload New Track", None #
@@ -1600,9 +1733,11 @@ def create_interface():
             outputs=[
                 final_audio_player, final_time_text, processed_audio_state,
                 extracted_vocals_state, extracted_instrumental_state,
+                extracted_drums_state, extracted_bass_state, extracted_other_state,
                 processed_vocals_path, processed_instrumental_path,
                 final_output_audio, final_output_time,
-                download_vocals_btn, download_instrumental_btn
+                download_vocals_btn, download_instrumental_btn,
+                out_drums, out_bass, out_other, out_vocals
             ]
         )
 
@@ -1662,6 +1797,15 @@ def create_interface():
         download_instrumental_btn.click(
             fn=save_file_instrumental, inputs=[extracted_instrumental_state], outputs=[gr.File(label="Download Instrumental")]
         )
+        download_drums_btn.click(
+            fn=save_file_drums, inputs=[extracted_drums_state], outputs=[gr.File(label="Download Drums")]
+        )
+        download_bass_btn.click(
+            fn=save_file_bass, inputs=[extracted_bass_state], outputs=[gr.File(label="Download Bass")]
+        )
+        download_other_btn.click(
+            fn=save_file_other, inputs=[extracted_other_state], outputs=[gr.File(label="Download Other")]
+        )
 
         # Return the app instance
         return app
@@ -1677,4 +1821,4 @@ if __name__ == "__main__":
     app_instance = create_interface()
     print("Launching Gradio interface...") #
     # Consider adding share=False explicitly if not needed
-    app_instance.launch(debug=True)  # Removed share=False to match original maybe? Add if needed.
+    app_instance.launch(css=custom_css())  # move css here  # Removed share=False to match original maybe? Add if needed.
