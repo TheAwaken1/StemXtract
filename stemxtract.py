@@ -1821,4 +1821,5 @@ if __name__ == "__main__":
     app_instance = create_interface()
     print("Launching Gradio interface...") #
     # Consider adding share=False explicitly if not needed
-    app_instance.launch(css=custom_css())  # move css here  # Removed share=False to match original maybe? Add if needed.
+
+    app_instance.launch()
