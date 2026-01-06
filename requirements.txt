@@ -5,3 +5,7 @@ diffq==0.2.4
 matplotlib==3.10.1
 pedalboard==0.9.16
 scipy==1.15.2
+tensorflow<2.10.0
+httpx>=0.24.0
+yt-dlp
+ 
