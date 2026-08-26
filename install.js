@@ -49,7 +49,11 @@ module.exports = {
         "path": "app",                // Edit this to customize the path to start the shell from
         "message": [
           "uv pip install gradio devicetorch",
-          "uv pip install -r requirements.txt"
+          "uv pip install -r requirements.txt",
+          // yt-dlp is unpinned in requirements.txt; force the latest release so
+          // fresh installs aren't left on a stale resolver-cached version that
+          // YouTube's bot detection may already reject with HTTP 403.
+          "uv pip install yt-dlp -U"
         ]
       }
     },
